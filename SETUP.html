@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GetIt2gether — Setup Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#080810; --surface:#10101c; --card:#16162a; --border:rgba(255,255,255,0.08); --accent:#7c6af7; --text:#f0eeff; --muted:rgba(240,238,255,0.5); --success:#6af79e; --warn:#f7b76a; --danger:#f76a6a; }
+    body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; font-size:15px; line-height:1.7; }
+    a { color:var(--accent); }
+    a:hover { opacity:.8; }
+
+    nav { position:sticky; top:0; background:rgba(8,8,16,.9); backdrop-filter:blur(20px); border-bottom:0.5px solid var(--border); padding:16px 40px; display:flex; align-items:center; justify-content:space-between; z-index:100; }
+    .nav-logo { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; background:linear-gradient(135deg,var(--accent),#e86af7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-decoration:none; }
+    .nav-back { font-size:13px; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:6px; }
+    .nav-back:hover { color:var(--text); }
+
+    .page { max-width:780px; margin:0 auto; padding:60px 24px 100px; }
+
+    h1 { font-family:'Syne',sans-serif; font-size:40px; font-weight:800; letter-spacing:-0.02em; margin-bottom:12px; }
+    .subtitle { font-size:17px; color:var(--muted); margin-bottom:48px; }
+    h2 { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin:48px 0 16px; display:flex; align-items:center; gap:12px; }
+    h3 { font-size:16px; font-weight:600; margin:20px 0 8px; color:var(--text); }
+    p  { color:var(--muted); margin-bottom:12px; }
+
+    .step-number { width:32px; height:32px; border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; flex-shrink:0; }
+
+    .card { background:var(--card); border:0.5px solid var(--border); border-radius:14px; padding:24px 28px; margin-bottom:12px; }
+    .card p { margin:0; }
+
+    pre, code { font-family:'Space Mono',monospace; font-size:13px; }
+    pre { background:var(--surface); border:0.5px solid var(--border); border-radius:10px; padding:20px 24px; overflow-x:auto; color:#b8aeff; line-height:1.6; margin:12px 0 20px; }
+    code { background:rgba(124,106,247,.12); padding:2px 6px; border-radius:4px; color:#b8aeff; font-size:12px; }
+
+    .badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; }
+    .badge-free    { background:rgba(106,247,158,.1);  border:0.5px solid rgba(106,247,158,.3);  color:var(--success); }
+    .badge-warn    { background:rgba(247,183,106,.08); border:0.5px solid rgba(247,183,106,.3);  color:var(--warn); }
+    .badge-required{ background:rgba(247,106,106,.1);  border:0.5px solid rgba(247,106,106,.3);  color:var(--danger); }
+
+    .tip { background:rgba(124,106,247,.06); border:0.5px solid rgba(124,106,247,.2); border-left:3px solid var(--accent); border-radius:8px; padding:14px 18px; margin:16px 0; font-size:13px; color:var(--muted); }
+    .tip strong { color:var(--text); }
+
+    .rules-block { background:var(--surface); border:0.5px solid var(--border); border-radius:10px; padding:20px 24px; margin:12px 0; }
+    .rules-block pre { margin:0; background:transparent; border:none; padding:0; }
+
+    .checklist { list-style:none; display:flex; flex-direction:column; gap:8px; margin:16px 0; }
+    .checklist li { display:flex; align-items:flex-start; gap:10px; font-size:14px; color:var(--muted); }
+    .checklist li::before { content:'✓'; color:var(--success); font-weight:700; flex-shrink:0; margin-top:1px; }
+
+    .files-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0; }
+    .file-card { background:var(--surface); border:0.5px solid var(--border); border-radius:10px; padding:14px 16px; }
+    .file-name { font-family:'Space Mono',monospace; font-size:12px; color:#b8aeff; font-weight:700; margin-bottom:4px; }
+    .file-desc { font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="splash.html">GetIt2gether</a>
+  <a class="nav-back" href="auth.html">← Back to Sign In</a>
+</nav>
+
+<div class="page">
+  <h1>🔥 Firebase Setup</h1>
+  <p class="subtitle">Connect a real backend in about 10 minutes. Free. No server needed.</p>
+
+  <!-- What you get -->
+  <div class="card">
+    <h3>What Firebase gives you</h3>
+    <ul class="checklist">
+      <li>Real user accounts with secure email/password authentication</li>
+      <li>Tasks stored in the cloud — accessible from any device, any browser</li>
+      <li>Real-time sync — add a task on your phone, see it on your laptop instantly</li>
+      <li>Personality themes and notification settings persisted per user</li>
+      <li><span class="badge badge-free">Free</span> Firebase Spark plan covers ~50,000 reads and 20,000 writes per day</li>
+    </ul>
+  </div>
+
+  <!-- Files overview -->
+  <h2><div class="step-number">📁</div> Files in this project</h2>
+  <div class="files-grid">
+    <div class="file-card"><div class="file-name">firebase-config.js</div><div class="file-desc">⬅️ You only need to edit this one file</div></div>
+    <div class="file-card"><div class="file-name">splash.html</div><div class="file-desc">Landing page</div></div>
+    <div class="file-card"><div class="file-name">auth.html</div><div class="file-desc">Login / Sign up (uses Firebase Auth)</div></div>
+    <div class="file-card"><div class="file-name">app.html</div><div class="file-desc">The app (uses Firestore for tasks)</div></div>
+    <div class="file-card"><div class="file-name">styles.css</div><div class="file-desc">All visual themes</div></div>
+    <div class="file-card"><div class="file-name">SETUP.html</div><div class="file-desc">This page</div></div>
+  </div>
+
+  <!-- Step 1 -->
+  <h2><div class="step-number">1</div> Create a Firebase Project</h2>
+  <div class="card">
+    <ol style="padding-left:20px;display:flex;flex-direction:column;gap:10px;color:var(--muted)">
+      <li>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+      <li>Click <strong style="color:var(--text)">Add project</strong></li>
+      <li>Name it something like <code>getit2gether</code></li>
+      <li>Disable Google Analytics (not needed) → <strong style="color:var(--text)">Create project</strong></li>
+    </ol>
+  </div>
+
+  <!-- Step 2 -->
+  <h2><div class="step-number">2</div> Register a Web App &amp; Get Your Config</h2>
+  <div class="card">
+    <ol style="padding-left:20px;display:flex;flex-direction:column;gap:10px;color:var(--muted)">
+      <li>Inside your project, click the <strong style="color:var(--text)">&lt;/&gt; Web</strong> icon to add a web app</li>
+      <li>Give it a nickname (e.g. <code>getit2gether-web</code>) — don't enable Firebase Hosting</li>
+      <li>Click <strong style="color:var(--text)">Register app</strong></li>
+      <li>You'll see a <code>firebaseConfig</code> object. Copy all of it — you'll need it in Step 4.</li>
+    </ol>
+  </div>
+
+  <div class="tip">
+    <strong>What the config looks like:</strong><br>
+    <pre style="margin-top:10px">{
+  apiKey: "AIzaSy...",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123:web:abc123"
+}</pre>
+  </div>
+
+  <!-- Step 3 -->
+  <h2><div class="step-number">3</div> Enable Authentication</h2>
+  <div class="card">
+    <ol style="padding-left:20px;display:flex;flex-direction:column;gap:10px;color:var(--muted)">
+      <li>In the Firebase console sidebar, click <strong style="color:var(--text)">Authentication</strong> → <strong style="color:var(--text)">Get started</strong></li>
+      <li>Under <strong style="color:var(--text)">Sign-in method</strong>, click <strong style="color:var(--text)">Email/Password</strong></li>
+      <li>Toggle it to <strong style="color:var(--text)">Enabled</strong> → Save</li>
+    </ol>
+    <div class="tip" style="margin-top:16px;margin-bottom:0">That's it for auth. Firebase handles password hashing, tokens, session persistence — everything.</div>
+  </div>
+
+  <!-- Step 4 -->
+  <h2><div class="step-number">4</div> Enable Firestore Database</h2>
+  <div class="card">
+    <ol style="padding-left:20px;display:flex;flex-direction:column;gap:10px;color:var(--muted)">
+      <li>In the sidebar, click <strong style="color:var(--text)">Firestore Database</strong> → <strong style="color:var(--text)">Create database</strong></li>
+      <li>Choose <strong style="color:var(--text)">Start in production mode</strong> (you'll set rules next)</li>
+      <li>Pick a Cloud Firestore location close to your users → <strong style="color:var(--text)">Enable</strong></li>
+    </ol>
+  </div>
+
+  <!-- Step 5 — Security Rules -->
+  <h2><div class="step-number">5</div> Set Firestore Security Rules <span class="badge badge-required" style="margin-left:4px">Required</span></h2>
+  <p>By default production mode blocks all reads and writes. Paste these rules so users can only access their own data:</p>
+  <div class="rules-block">
+    <pre>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Each user document and their tasks sub-collection
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /tasks/{taskId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}</pre>
+  </div>
+  <p>To apply: In Firestore → <strong style="color:var(--text)">Rules</strong> tab → paste the above → <strong style="color:var(--text)">Publish</strong>.</p>
+  <div class="tip"><strong>What this does:</strong> A signed-in user can only read and write documents under <code>/users/{their own UID}/</code>. No user can see another user's tasks.</div>
+
+  <!-- Step 6 -->
+  <h2><div class="step-number">6</div> Paste Your Config into <code>firebase-config.js</code></h2>
+  <p>Open <code>firebase-config.js</code> in a text editor and replace the placeholder values with your actual config from Step 2:</p>
+  <pre>const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyYOUR_REAL_KEY_HERE",
+  authDomain:        "your-project.firebaseapp.com",
+  projectId:         "your-project",
+  storageBucket:     "your-project.appspot.com",
+  messagingSenderId: "123456789012",
+  appId:             "1:123456789012:web:abcdef123456",
+};</pre>
+  <div class="tip"><strong>Save the file</strong>, then reload <code>auth.html</code>. The orange config warning should disappear.</div>
+
+  <!-- Step 7 — Hosting -->
+  <h2><div class="step-number">7</div> Host It (So Any Device Can Access It) <span class="badge badge-warn" style="margin-left:4px">Recommended</span></h2>
+  <p>Right now these are local files. To access your app from a phone or another computer, you need to host them. The easiest free options:</p>
+
+  <h3>Option A — Firebase Hosting (recommended, free)</h3>
+  <pre>npm install -g firebase-tools
+firebase login
+firebase init hosting    # select your project, set public dir to "."
+firebase deploy</pre>
+  <p>Your app goes live at <code>your-project.web.app</code> — accessible from any device.</p>
+
+  <h3>Option B — Netlify Drop (no CLI needed)</h3>
+  <ol style="padding-left:20px;color:var(--muted);display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+    <li>Go to <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a></li>
+    <li>Drag your entire project folder onto the page</li>
+    <li>Netlify gives you a public URL instantly</li>
+    <li>Add your Netlify URL to Firebase → Authentication → Authorized domains</li>
+  </ol>
+
+  <div class="tip">
+    <strong>Important after deploying:</strong> Go to Firebase Console → Authentication → Settings → <strong>Authorized domains</strong> and add your deployed domain (e.g. <code>your-project.web.app</code>). Otherwise sign-in will be blocked.
+  </div>
+
+  <!-- Troubleshooting -->
+  <h2><div class="step-number">🔧</div> Troubleshooting</h2>
+  <div class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div>
+      <div style="font-weight:600;color:var(--text);margin-bottom:4px">Orange config warning still showing</div>
+      <div style="font-size:13px;color:var(--muted)">Make sure you saved <code>firebase-config.js</code> and hard-refreshed the page (Ctrl+Shift+R / Cmd+Shift+R).</div>
+    </div>
+    <div>
+      <div style="font-weight:600;color:var(--text);margin-bottom:4px">"auth/unauthorized-domain" error</div>
+      <div style="font-size:13px;color:var(--muted)">Add your domain to Firebase → Authentication → Settings → Authorized domains. For local testing, <code>localhost</code> is already authorized.</div>
+    </div>
+    <div>
+      <div style="font-weight:600;color:var(--text);margin-bottom:4px">Tasks not saving / "Missing or insufficient permissions"</div>
+      <div style="font-size:13px;color:var(--muted)">Your Firestore security rules aren't set yet. Go to Step 5 and publish the rules.</div>
+    </div>
+    <div>
+      <div style="font-weight:600;color:var(--text);margin-bottom:4px">Opening HTML files directly (file:// protocol)</div>
+      <div style="font-size:13px;color:var(--muted)">Firebase auth works on <code>localhost</code> and deployed domains, but may block on raw <code>file://</code> URLs. Use a local server: <code>npx serve .</code> or the VS Code Live Server extension.</div>
+    </div>
+  </div>
+
+  <div class="tip" style="margin-top:40px">
+    <strong>That's it!</strong> Once <code>firebase-config.js</code> is configured and your Firestore rules are published, GetIt2gether has a fully functional backend — real accounts, real sync, any device.
+  </div>
+</div>
+
+</body>
+</html>

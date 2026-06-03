@@ -4,12 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GetIt2gether</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#7c6af7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GetIt2gether">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="notif-container" id="notif-container"></div>
+
+<!-- Loading overlay — shown while Firebase auth resolves -->
+<div id="app-loading" style="position:fixed;inset:0;background:#080810;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
+  <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;background:linear-gradient(135deg,#7c6af7,#e86af7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">GetIt2gether</div>
+  <div style="width:32px;height:32px;border:2px solid rgba(124,106,247,.3);border-top-color:#7c6af7;border-radius:50%;animation:spin .8s linear infinite"></div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
 
 <!-- Add / Edit Task Modal -->
 <div class="modal-overlay" id="modal-overlay">
@@ -24,21 +38,15 @@
       <select class="form-select" id="input-cat"></select>
     </div>
     <div class="form-group">
-      <label class="form-label" id="label-detail">Course / Location / Detail</label>
-      <input class="form-input" id="input-course" placeholder="e.g. PSYCH 201, Café Shift, Dr. Patel…"/>
+      <label class="form-label">Detail <span style="text-transform:none;letter-spacing:0;font-weight:400;opacity:.7">(course, location, etc.)</span></label>
+      <input class="form-input" id="input-course" placeholder="e.g. PSYCH 201, Dr. Patel, Campus Café…"/>
     </div>
     <div class="form-group">
       <label class="form-label">Type</label>
       <select class="form-select" id="input-type">
-        <option>Assignment</option>
-        <option>Exam</option>
-        <option>Quiz</option>
-        <option>Project</option>
-        <option>Reading</option>
-        <option>Work Shift</option>
-        <option>Appointment</option>
-        <option>Errand</option>
-        <option>Other</option>
+        <option>Assignment</option><option>Exam</option><option>Quiz</option>
+        <option>Project</option><option>Reading</option><option>Work Shift</option>
+        <option>Appointment</option><option>Errand</option><option>Other</option>
       </select>
     </div>
     <div class="form-group">
@@ -48,15 +56,13 @@
     <div class="form-group">
       <label class="form-label">Priority</label>
       <select class="form-select" id="input-priority">
-        <option>High</option>
-        <option>Medium</option>
-        <option>Low</option>
+        <option>High</option><option>Medium</option><option>Low</option>
       </select>
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal()" style="flex:1">Cancel</button>
       <button class="btn btn-primary" onclick="saveTask()" style="flex:2">
-        <i class="ti ti-check" aria-hidden="true"></i> <span id="modal-save-label">Save Task</span>
+        <i class="ti ti-check"></i> <span id="modal-save-label">Save Task</span>
       </button>
     </div>
   </div>
@@ -73,70 +79,43 @@
       </div>
 
       <div class="sidebar-section-label" style="margin-bottom:8px">Overview</div>
-      <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard', this)">
-        <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
-      </div>
-      <div class="nav-item" id="nav-tasks" onclick="switchView('tasks', this)">
-        <i class="ti ti-checklist" aria-hidden="true"></i> All Tasks
-        <span class="nav-badge" id="badge-all">0</span>
-      </div>
-      <div class="nav-item" id="nav-upcoming" onclick="switchView('upcoming', this)">
-        <i class="ti ti-calendar-event" aria-hidden="true"></i> Upcoming
-      </div>
+      <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="nav-item" id="nav-tasks"    onclick="switchView('tasks',this)"><i class="ti ti-checklist"></i> All Tasks <span class="nav-badge" id="badge-all">0</span></div>
+      <div class="nav-item" id="nav-upcoming" onclick="switchView('upcoming',this)"><i class="ti ti-calendar-event"></i> Upcoming</div>
 
-      <div class="sidebar-section-label" style="margin-top:12px;margin-bottom:8px" id="label-categories">Categories</div>
-      <div class="nav-item" id="nav-school" onclick="switchView('school', this)">
-        <i class="ti ti-book" aria-hidden="true"></i> <span id="nav-school-label">School</span>
-        <span class="nav-badge" id="badge-school">0</span>
-      </div>
-      <div class="nav-item" id="nav-work" onclick="switchView('work', this)">
-        <i class="ti ti-briefcase" aria-hidden="true"></i> <span id="nav-work-label">Work</span>
-        <span class="nav-badge" id="badge-work">0</span>
-      </div>
-      <div class="nav-item" id="nav-appts" onclick="switchView('appts', this)">
-        <i class="ti ti-calendar-check" aria-hidden="true"></i> <span id="nav-appts-label">Appointments</span>
-        <span class="nav-badge" id="badge-appts">0</span>
-      </div>
-      <div class="nav-item" id="nav-chores" onclick="switchView('chores', this)">
-        <i class="ti ti-home" aria-hidden="true"></i> <span id="nav-chores-label">Chores</span>
-        <span class="nav-badge" id="badge-chores">0</span>
-      </div>
-      <div class="nav-item" id="nav-todo" onclick="switchView('todo', this)">
-        <i class="ti ti-circle-check" aria-hidden="true"></i> <span id="nav-todo-label">To-Do</span>
-        <span class="nav-badge" id="badge-todo">0</span>
-      </div>
+      <div class="sidebar-section-label" style="margin-top:12px;margin-bottom:8px">Categories</div>
+      <div class="nav-item" id="nav-school" onclick="switchView('school',this)"><i class="ti ti-book"></i> <span id="nav-school-label">School</span> <span class="nav-badge" id="badge-school">0</span></div>
+      <div class="nav-item" id="nav-work"   onclick="switchView('work',this)"><i class="ti ti-briefcase"></i> <span id="nav-work-label">Work</span> <span class="nav-badge" id="badge-work">0</span></div>
+      <div class="nav-item" id="nav-appts"  onclick="switchView('appts',this)"><i class="ti ti-calendar-check"></i> <span id="nav-appts-label">Appointments</span> <span class="nav-badge" id="badge-appts">0</span></div>
+      <div class="nav-item" id="nav-chores" onclick="switchView('chores',this)"><i class="ti ti-home"></i> <span id="nav-chores-label">Chores</span> <span class="nav-badge" id="badge-chores">0</span></div>
+      <div class="nav-item" id="nav-todo"   onclick="switchView('todo',this)"><i class="ti ti-circle-check"></i> <span id="nav-todo-label">To-Do</span> <span class="nav-badge" id="badge-todo">0</span></div>
 
       <div class="sidebar-section-label" style="margin-top:12px;margin-bottom:8px">Settings</div>
-      <div class="nav-item" id="nav-notifs" onclick="switchView('notifs', this)">
-        <i class="ti ti-bell" aria-hidden="true"></i> Notifications
-        <span class="nav-badge" style="background:var(--p-warn);color:#1a1000" id="badge-notifs">NEW</span>
-      </div>
+      <div class="nav-item" id="nav-notifs" onclick="switchView('notifs',this)"><i class="ti ti-bell"></i> Notifications <span class="nav-badge" style="background:var(--p-warn);color:#1a1000" id="badge-notifs">NEW</span></div>
 
       <div class="sidebar-spacer"></div>
 
-      <!-- User info -->
-      <div class="user-bar" id="user-bar">
+      <!-- User bar -->
+      <div class="user-bar">
         <div class="user-avatar" id="user-avatar">?</div>
         <div class="user-info">
-          <div class="user-name" id="user-name">Loading...</div>
+          <div class="user-name"  id="user-name">Loading…</div>
           <div class="user-email" id="user-email"></div>
         </div>
-        <button class="logout-btn" onclick="logout()" title="Log out">
-          <i class="ti ti-logout" style="font-size:14px"></i>
-        </button>
+        <button class="logout-btn" onclick="logout()" title="Log out"><i class="ti ti-logout" style="font-size:14px"></i></button>
       </div>
 
       <!-- Vibe switcher -->
       <div class="personality-switcher">
         <div class="switcher-label">Vibe</div>
         <div class="personality-pills">
-          <div class="p-pill active" onclick="setPersonality('default')" id="pill-default">🌌 Night Owl</div>
-          <div class="p-pill" onclick="setPersonality('zen')" id="pill-zen">🌿 Zen</div>
-          <div class="p-pill" onclick="setPersonality('grind')" id="pill-grind">⚡ Grind</div>
-          <div class="p-pill" onclick="setPersonality('bubbly')" id="pill-bubbly">🌸 Bubbly</div>
-          <div class="p-pill" onclick="setPersonality('terminal')" id="pill-terminal">💾 Terminal</div>
-          <div class="p-pill" onclick="setPersonality('cottage')" id="pill-cottage">🍄 Cottage</div>
-          <div class="p-pill" onclick="setPersonality('cyber')" id="pill-cyber">🔷 Cyber</div>
+          <div class="p-pill active" onclick="setPersonality('default')"  id="pill-default">🌌 Night Owl</div>
+          <div class="p-pill"        onclick="setPersonality('zen')"      id="pill-zen">🌿 Zen</div>
+          <div class="p-pill"        onclick="setPersonality('grind')"    id="pill-grind">⚡ Grind</div>
+          <div class="p-pill"        onclick="setPersonality('bubbly')"   id="pill-bubbly">🌸 Bubbly</div>
+          <div class="p-pill"        onclick="setPersonality('terminal')" id="pill-terminal">💾 Terminal</div>
+          <div class="p-pill"        onclick="setPersonality('cottage')"  id="pill-cottage">🍄 Cottage</div>
+          <div class="p-pill"        onclick="setPersonality('cyber')"    id="pill-cyber">🔷 Cyber</div>
         </div>
       </div>
     </div>
@@ -144,307 +123,199 @@
     <!-- MAIN -->
     <div class="main">
       <div class="topbar">
-        <div class="topbar-title" id="view-title">Dashboard</div>
+        <div class="topbar-title"    id="view-title">Dashboard</div>
         <div class="topbar-greeting" id="topbar-greeting">Hey, you've got this 👊</div>
-        <button class="btn btn-notif" onclick="fireRandomMeme()" style="margin-right:4px">
-          <i class="ti ti-bell" aria-hidden="true"></i> Test Notif
-        </button>
-        <button class="btn btn-primary" onclick="openModal()">
-          <i class="ti ti-plus" aria-hidden="true"></i> Add Task
-        </button>
+        <button class="btn btn-notif" onclick="fireRandomMeme()" style="margin-right:4px"><i class="ti ti-bell"></i> Test Notif</button>
+        <button class="btn btn-primary" onclick="openModal()"><i class="ti ti-plus"></i> Add Task</button>
       </div>
-      <div class="content-area" id="content-area"></div>
+      <div class="content-area" id="content-area">
+        <div class="empty-state">Loading your tasks…</div>
+      </div>
     </div>
 
   </div>
 </div>
 
+<!-- Firebase SDK v10 compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+
 <script>
 // ── CATEGORY SYSTEM ────────────────────────────────────────────────────────────
+const CAT_KEYS = ['school','work','appts','chores','todo'];
 
-// Internal keys (stored in data, never changes)
-const CAT_KEYS = ['school', 'work', 'appts', 'chores', 'todo'];
-
-// Display names per personality
 const CAT_NAMES = {
-  default:  { school: 'School',       work: 'Work',          appts: 'Appointments', chores: 'Chores',          todo: 'To-Do'         },
-  zen:      { school: 'Studies',      work: 'Livelihood',    appts: 'Wellbeing',    chores: 'Home Care',       todo: 'Intentions'    },
-  grind:    { school: 'The Grind',    work: 'Mission: Work', appts: 'Ops',          chores: 'Base Maintenance',todo: 'Queue'         },
-  bubbly:   { school: 'Classes 🌸',   work: 'Job Stuff ☕',  appts: 'Appts 💅',     chores: 'Lil Chores 🧹',  todo: 'My List 🎀'   },
-  terminal: { school: 'ACADEMICS',    work: 'EMPLOYMENT',    appts: 'SCHEDULED_OPS',chores: 'SYSTEM_MAINT',   todo: 'TASK_QUEUE'    },
-  cottage:  { school: 'The Studies',  work: 'The Work',      appts: 'Gatherings',   chores: 'The Homestead',  todo: 'Odds & Ends'   },
-  cyber:    { school: 'EDU_MATRIX',   work: 'CORP_OPS',      appts: 'SYNC_EVENTS',  chores: 'MAINTENANCE',    todo: 'MISC_QUEUE'    },
+  default:  { school:'School',       work:'Work',           appts:'Appointments',  chores:'Chores',           todo:'To-Do'        },
+  zen:      { school:'Studies',      work:'Livelihood',     appts:'Wellbeing',     chores:'Home Care',        todo:'Intentions'   },
+  grind:    { school:'The Grind',    work:'Mission: Work',  appts:'Ops',           chores:'Base Maintenance', todo:'Queue'        },
+  bubbly:   { school:'Classes 🌸',   work:'Job Stuff ☕',   appts:'Appts 💅',      chores:'Lil Chores 🧹',   todo:'My List 🎀'  },
+  terminal: { school:'ACADEMICS',    work:'EMPLOYMENT',     appts:'SCHEDULED_OPS', chores:'SYSTEM_MAINT',     todo:'TASK_QUEUE'   },
+  cottage:  { school:'The Studies',  work:'The Work',       appts:'Gatherings',    chores:'The Homestead',    todo:'Odds & Ends'  },
+  cyber:    { school:'EDU_MATRIX',   work:'CORP_OPS',       appts:'SYNC_EVENTS',   chores:'MAINTENANCE',      todo:'MISC_QUEUE'   },
 };
 
-const CAT_ICONS = {
-  school: 'ti-book',
-  work:   'ti-briefcase',
-  appts:  'ti-calendar-check',
-  chores: 'ti-home',
-  todo:   'ti-circle-check',
-};
+const CAT_ICONS  = { school:'ti-book', work:'ti-briefcase', appts:'ti-calendar-check', chores:'ti-home', todo:'ti-circle-check' };
+const CAT_EMOJIS = { school:'📚', work:'💼', appts:'🗓️', chores:'🏠', todo:'✅' };
 
-const CAT_EMOJIS = {
-  school: '📚', work: '💼', appts: '🗓️', chores: '🏠', todo: '✅'
-};
-
-function catLabel(key) {
-  return (CAT_NAMES[currentPersonality] || CAT_NAMES.default)[key] || key;
-}
+function catLabel(k) { return (CAT_NAMES[currentPersonality] || CAT_NAMES.default)[k] || k; }
 
 // ── PERSONALITIES ──────────────────────────────────────────────────────────────
-
 const PERSONALITIES = {
-  default: {
-    bodyClass: '',
-    logoName: 'GetIt2gether',
-    tagline: 'your life, actually organized',
-    greeting: "Hey, you've got this 👊",
-    bannerMsg: "Every task completed is a step closer to who you're becoming.",
-    modalTitle: 'Add New Task',
-  },
-  zen: {
-    bodyClass: 'personality-zen',
-    logoName: 'Serenely',
-    tagline: 'breathe, focus, flow',
-    greeting: 'A calm mind moves mountains 🌿',
-    bannerMsg: "You don't have to do everything at once. Begin with one breath, one task.",
-    modalTitle: 'What needs tending to?',
-  },
-  grind: {
-    bodyClass: 'personality-grind',
-    logoName: 'GRINDSET',
-    tagline: 'NO DAYS OFF',
-    greeting: 'LOCK IN. CLOCK IN. ⚡',
-    bannerMsg: 'YOUR FUTURE SELF IS WATCHING. MAKE THEM PROUD.',
-    modalTitle: 'ADD A NEW MISSION',
-  },
-  bubbly: {
-    bodyClass: 'personality-bubbly',
-    logoName: 'Sparkle ✨',
-    tagline: 'tasks are cute, actually',
-    greeting: "You're doing amazing, sweetie 🌸",
-    bannerMsg: 'Checking off tasks is like collecting little wins — you deserve them all! 🎀',
-    modalTitle: "Add a cute lil' task!",
-  },
-  terminal: {
-    bodyClass: 'personality-terminal',
-    logoName: 'GIT2G.exe',
-    tagline: '> system: life_manager.sh',
-    greeting: '> STATUS: operational. tasks pending.',
-    bannerMsg: '> WARNING: procrastination detected. EXECUTING focus.sh...',
-    modalTitle: '> INPUT: new_task --create',
-  },
-  cottage: {
-    bodyClass: 'personality-cottage',
-    logoName: 'Little Tasks',
-    tagline: 'tending life like a garden',
-    greeting: 'Good morning, dear. What shall we tend to? 🌻',
-    bannerMsg: 'Every task completed is a seed planted. Tend your garden gently, one task at a time.',
-    modalTitle: 'Add something to tend to',
-  },
-  cyber: {
-    bodyClass: 'personality-cyber',
-    logoName: 'GIT2G//SYS',
-    tagline: 'NEURAL TASK NETWORK v2.0',
-    greeting: 'UPLINK ESTABLISHED. 🔷 TASKS QUEUED.',
-    bannerMsg: 'IN THE GRID, EVERY DEADLINE IS A MISSION. JACK IN. EXECUTE.',
-    modalTitle: '// NEW TASK — UPLOAD',
-  },
+  default:  { bodyClass:'',                  logoName:'GetIt2gether', tagline:'your life, actually organized', greeting:"Hey, you've got this 👊",            bannerMsg:"Every task completed is a step closer to who you're becoming.",                           modalTitle:'Add New Task'             },
+  zen:      { bodyClass:'personality-zen',   logoName:'Serenely',     tagline:'breathe, focus, flow',         greeting:'A calm mind moves mountains 🌿',       bannerMsg:"You don't have to do everything at once. Begin with one breath, one task.",           modalTitle:'What needs tending to?'   },
+  grind:    { bodyClass:'personality-grind', logoName:'GRINDSET',     tagline:'NO DAYS OFF',                  greeting:'LOCK IN. CLOCK IN. ⚡',               bannerMsg:'YOUR FUTURE SELF IS WATCHING. MAKE THEM PROUD.',                                          modalTitle:'ADD A NEW MISSION'        },
+  bubbly:   { bodyClass:'personality-bubbly',logoName:'Sparkle ✨',   tagline:'tasks are cute, actually',     greeting:"You're doing amazing, sweetie 🌸",    bannerMsg:'Checking off tasks is like collecting little wins — you deserve them all! 🎀',          modalTitle:"Add a cute lil' task!"    },
+  terminal: { bodyClass:'personality-terminal',logoName:'GIT2G.exe',  tagline:'> system: life_manager.sh',    greeting:'> STATUS: operational. tasks pending.',bannerMsg:'> WARNING: procrastination detected. EXECUTING focus.sh...',                            modalTitle:'> INPUT: new_task --create'},
+  cottage:  { bodyClass:'personality-cottage',logoName:'Little Tasks', tagline:'tending life like a garden',  greeting:'Good morning, dear. What shall we tend to? 🌻',bannerMsg:'Every task completed is a seed planted. Tend your garden gently.',              modalTitle:'Add something to tend to' },
+  cyber:    { bodyClass:'personality-cyber',  logoName:'GIT2G//SYS',  tagline:'NEURAL TASK NETWORK v2.0',     greeting:'UPLINK ESTABLISHED. 🔷 TASKS QUEUED.',bannerMsg:'IN THE GRID, EVERY DEADLINE IS A MISSION. JACK IN. EXECUTE.',                           modalTitle:'// NEW TASK — UPLOAD'     },
 };
 
 // ── MEME PACKS ─────────────────────────────────────────────────────────────────
-
 const MEME_PACKS = {
-  chaos: {
-    name: 'Chaotic Energy', emoji: '🔥', desc: 'Unhinged motivation', color: '#ff4500',
-    memes: [
-      { bg: '😤', top: 'ME AT 2AM', bot: 'NOT DOING MY HOMEWORK' },
-      { bg: '💀', top: 'MY ASSIGNMENT', bot: 'DUE IN 6 HOURS' },
-      { bg: '🐸', top: "IT'S NOT PROCRASTINATING", bot: 'IF YOU NEVER STOP' },
-      { bg: '😭', top: 'THE MOMENT I REALIZE', bot: "IT'S ALREADY WEDNESDAY" },
-      { bg: '🦆', top: 'PROFESSOR SAYS "EASY"', bot: 'TAKES 6 HOURS' },
-      { bg: '🤡', top: 'ME THINKING I COULD', bot: 'DO IT TOMORROW' },
-    ],
-  },
-  motivational: {
-    name: 'Hype Beast', emoji: '💪', desc: 'Pure pump-up energy', color: '#7c6af7',
-    memes: [
-      { bg: '🦁', top: "YOU DIDN'T COME THIS FAR", bot: 'TO ONLY COME THIS FAR' },
-      { bg: '🚀', top: 'FUTURE YOU IS DEPENDING', bot: 'ON PRESENT YOU. DO IT.' },
-      { bg: '💎', top: "THE TASK WON'T", bot: "DO ITSELF. LET'S GO." },
-      { bg: '⚡', top: 'ONE TASK DOWN.', bot: "YOU'RE UNSTOPPABLE." },
-      { bg: '🏆', top: 'FINISH THIS. THEN', bot: 'GO CELEBRATE. YOU EARNED IT.' },
-      { bg: '🔥', top: 'EVERY EXPERT WAS ONCE', bot: 'A BEGINNER. NOW GO.' },
-    ],
-  },
-  spongebob: {
-    name: 'SpongeBob Era', emoji: '🧽', desc: 'Cartoon chaos mode', color: '#ffcc00',
-    memes: [
-      { bg: '🧽', top: '"I\'LL DO IT TOMORROW"', bot: '-ME, YESTERDAY, AND TODAY' },
-      { bg: '⭐', top: 'WHEN THE TASK', bot: 'IS DUE AT MIDNIGHT' },
-      { bg: '🦀', top: 'NO EXTENSIONS', bot: 'ME: O K A Y' },
-      { bg: '🍔', top: 'WORKING AT 3AM', bot: "LIKE I KNOW WHAT'S HAPPENING" },
-      { bg: '🐌', top: 'MY PRODUCTIVITY', bot: 'AFTER 9PM' },
-      { bg: '🪨', top: 'MY TASK LIST', bot: 'SITTING THERE JUDGING ME' },
-    ],
-  },
-  sigma: {
-    name: 'Sigma Grindset', emoji: '😤', desc: 'No excuses, all output', color: '#39ff14',
-    memes: [
-      { bg: '🧊', top: "SIGMAS DON'T PROCRASTINATE.", bot: 'THEY EXECUTE.' },
-      { bg: '📚', top: 'SLEEP IS FOR THE', bot: 'ALREADY FINISHED.' },
-      { bg: '🐺', top: 'LONE WOLF DOES THE', bot: 'TASK FIRST TRY.' },
-      { bg: '⚔️', top: 'YOUR DEADLINE IS NOT', bot: 'YOUR ENEMY. LAZINESS IS.' },
-      { bg: '🗿', top: 'REJECTION OF DISTRACTIONS.', bot: 'ACCEPTANCE OF DEADLINES.' },
-      { bg: '👁️', top: 'THE SIGMA SEES THE', bot: 'DUE DATE. AND DELIVERS.' },
-    ],
-  },
-  cozy: {
-    name: 'Soft Reminder', emoji: '🌸', desc: 'Gentle encouragement', color: '#ff6ec7',
-    memes: [
-      { bg: '🌸', top: 'HEY BESTIE...', bot: 'YOUR TASK IS WAITING 🥺' },
-      { bg: '🧸', top: 'YOU GOT THIS!!', bot: 'IT IS NOT SCARY 💕' },
-      { bg: '☕', top: 'DRINK SOME WATER.', bot: 'THEN DO THE THING 🌷' },
-      { bg: '🌈', top: 'SMALL STEPS ARE STILL', bot: "STEPS. YOU'RE DOING GREAT!" },
-      { bg: '🦋', top: 'OPEN THE DOCUMENT.', bot: "THAT'S LITERALLY STEP ONE 💖" },
-      { bg: '🍵', top: 'YOU ARE CAPABLE.', bot: 'YOU ARE ENOUGH. NOW GO.' },
-    ],
-  },
-  corporate: {
-    name: 'Corporate Meme', emoji: '💼', desc: 'LinkedIn meets chaos', color: '#0077b5',
-    memes: [
-      { bg: '💼', top: '"I\'M A HARD WORKER"', bot: 'ALSO ME: 47 TABS OPEN' },
-      { bg: '📊', top: 'SYNERGIZING YOUR', bot: 'PROCRASTINATION INTO ACTION' },
-      { bg: '🤝', top: 'PLEASE SEE ATTACHED', bot: '(I HAVE NOT ATTACHED IT)' },
-      { bg: '📈', top: 'QUARTERLY RESULTS:', bot: 'ZERO TASKS DONE' },
-      { bg: '☕', top: 'PER MY LAST EMAIL', bot: 'PLEASE DO YOUR TASK' },
-      { bg: '🖨️', top: '"CIRCLE BACK ON THAT"', bot: '-ME ABOUT MY DEADLINE' },
-    ],
-  },
-  boomer: {
-    name: 'Boomer Energy', emoji: '📠', desc: 'Dad joke productivity', color: '#c47c2b',
-    memes: [
-      { bg: '📠', top: 'BACK IN MY DAY WE', bot: "DIDN'T NEED REMINDERS" },
-      { bg: '📰', top: 'HAVE YOU TRIED', bot: 'JUST DOING THE TASK?' },
-      { bg: '🏌️', top: 'WORK HARD NOW', bot: 'SO YOU CAN GOLF SOMEDAY' },
-      { bg: '📟', top: 'I SENT YOU A FAX', bot: 'ABOUT YOUR DUE DATE' },
-      { bg: '🎣', top: "FISH DON'T PROCRASTINATE.", bot: 'BE THE FISH.' },
-      { bg: '📺', top: 'IN MY DAY GOOGLE', bot: 'WAS A LIBRARY CARD' },
-    ],
-  },
-  horror: {
-    name: 'Horror Mode', emoji: '👁️', desc: 'Your deadlines stalk you', color: '#8b0000',
-    memes: [
-      { bg: '👁️', top: 'THE TASK', bot: 'IS INSIDE THE HOUSE' },
-      { bg: '🩸', top: 'REDRUM', bot: 'IS DUE TOMORROW' },
-      { bg: '💀', top: 'YOUR SCHEDULE IS CALLING', bot: 'FROM INSIDE THE SYLLABUS' },
-      { bg: '🕷️', top: 'IT LURKS...', bot: 'YOUR UNFINISHED TASK' },
-      { bg: '🌑', top: 'YOU THOUGHT IT WAS OVER.', bot: 'THE DEADLINE AWAKENS.' },
-      { bg: '🪦', top: 'RIP YOUR SLEEP SCHEDULE', bot: 'KILLED BY PROCRASTINATION' },
-    ],
-  },
-  anime: {
-    name: 'Anime Arc', emoji: '⚔️', desc: 'Protagonist energy unlocked', color: '#ff6b35',
-    memes: [
-      { bg: '⚔️', top: 'THIS IS MY FINAL FORM.', bot: 'THE TASK IS DONE.' },
-      { bg: '🌸', top: 'MAIN CHARACTER DOES NOT', bot: 'MISS DEADLINES. YOU ARE MAIN.' },
-      { bg: '✨', top: 'NEW ARC JUST DROPPED:', bot: 'THE PERSON AWAKENS' },
-      { bg: '🔥', top: 'I HAVE SURPASSED', bot: 'MY OWN PROCRASTINATION' },
-      { bg: '💫', top: 'FLASHBACK EPISODE:', bot: 'YOU FORGOT THIS WAS DUE' },
-      { bg: '🌀', top: 'PLOT TWIST:', bot: 'YOU ACTUALLY SUBMIT ON TIME' },
-    ],
-  },
+  chaos:        { name:'Chaotic Energy',   emoji:'🔥', desc:'Unhinged motivation',      color:'#ff4500', memes:[{bg:'😤',top:'ME AT 2AM',bot:'NOT DOING MY HOMEWORK'},{bg:'💀',top:'MY TASK',bot:'DUE IN 6 HOURS'},{bg:'🐸',top:"IT'S NOT PROCRASTINATING",bot:'IF YOU NEVER STOP'},{bg:'😭',top:'THE MOMENT I REALIZE',bot:"IT'S ALREADY WEDNESDAY"},{bg:'🦆',top:'PROFESSOR SAYS "EASY"',bot:'TAKES 6 HOURS'},{bg:'🤡',top:'ME THINKING I COULD',bot:'DO IT TOMORROW'}] },
+  motivational: { name:'Hype Beast',       emoji:'💪', desc:'Pure pump-up energy',       color:'#7c6af7', memes:[{bg:'🦁',top:"YOU DIDN'T COME THIS FAR",bot:'TO ONLY COME THIS FAR'},{bg:'🚀',top:'FUTURE YOU IS DEPENDING',bot:'ON PRESENT YOU. DO IT.'},{bg:'💎',top:"THE TASK WON'T",bot:"DO ITSELF. LET'S GO."},{bg:'⚡',top:'ONE TASK DOWN.',bot:"YOU'RE UNSTOPPABLE."},{bg:'🏆',top:'FINISH THIS. THEN',bot:'GO CELEBRATE. EARNED IT.'},{bg:'🔥',top:'EVERY EXPERT WAS ONCE',bot:'A BEGINNER. NOW GO.'}] },
+  spongebob:    { name:'SpongeBob Era',    emoji:'🧽', desc:'Cartoon chaos mode',        color:'#ffcc00', memes:[{bg:'🧽',top:"\"I'LL DO IT TOMORROW\"",bot:'-ME, YESTERDAY, AND TODAY'},{bg:'⭐',top:'WHEN THE TASK',bot:'IS DUE AT MIDNIGHT'},{bg:'🦀',top:'NO EXTENSIONS',bot:'ME: O K A Y'},{bg:'🍔',top:'WORKING AT 3AM',bot:"LIKE I KNOW WHAT'S HAPPENING"},{bg:'🐌',top:'MY PRODUCTIVITY',bot:'AFTER 9PM'},{bg:'🪨',top:'MY TASK LIST',bot:'SITTING THERE JUDGING ME'}] },
+  sigma:        { name:'Sigma Grindset',   emoji:'😤', desc:'No excuses, all output',    color:'#39ff14', memes:[{bg:'🧊',top:"SIGMAS DON'T PROCRASTINATE.",bot:'THEY EXECUTE.'},{bg:'📚',top:'SLEEP IS FOR THE',bot:'ALREADY FINISHED.'},{bg:'🐺',top:'LONE WOLF DOES THE',bot:'TASK FIRST TRY.'},{bg:'⚔️',top:'YOUR DEADLINE IS NOT',bot:'YOUR ENEMY. LAZINESS IS.'},{bg:'🗿',top:'REJECTION OF DISTRACTIONS.',bot:'ACCEPTANCE OF DEADLINES.'},{bg:'👁️',top:'THE SIGMA SEES THE',bot:'DUE DATE. AND DELIVERS.'}] },
+  cozy:         { name:'Soft Reminder',    emoji:'🌸', desc:'Gentle encouragement',      color:'#ff6ec7', memes:[{bg:'🌸',top:'HEY BESTIE...',bot:'YOUR TASK IS WAITING 🥺'},{bg:'🧸',top:'YOU GOT THIS!!',bot:'IT IS NOT SCARY 💕'},{bg:'☕',top:'DRINK SOME WATER.',bot:'THEN DO THE THING 🌷'},{bg:'🌈',top:'SMALL STEPS ARE STILL',bot:"STEPS. YOU'RE DOING GREAT!"},{bg:'🦋',top:'OPEN THE DOCUMENT.',bot:"THAT'S LITERALLY STEP ONE 💖"},{bg:'🍵',top:'YOU ARE CAPABLE.',bot:'YOU ARE ENOUGH. NOW GO.'}] },
+  corporate:    { name:'Corporate Meme',   emoji:'💼', desc:'LinkedIn meets chaos',       color:'#0077b5', memes:[{bg:'💼',top:"\"I'M A HARD WORKER\"",bot:'ALSO ME: 47 TABS OPEN'},{bg:'📊',top:'SYNERGIZING YOUR',bot:'PROCRASTINATION INTO ACTION'},{bg:'🤝',top:'PLEASE SEE ATTACHED',bot:'(I HAVE NOT ATTACHED IT)'},{bg:'📈',top:'QUARTERLY RESULTS:',bot:'ZERO TASKS DONE'},{bg:'☕',top:'PER MY LAST EMAIL',bot:'PLEASE DO YOUR TASK'},{bg:'🖨️',top:'"CIRCLE BACK ON THAT"',bot:'-ME ABOUT MY DEADLINE'}] },
+  boomer:       { name:'Boomer Energy',    emoji:'📠', desc:'Dad joke productivity',      color:'#c47c2b', memes:[{bg:'📠',top:'BACK IN MY DAY WE',bot:"DIDN'T NEED REMINDERS"},{bg:'📰',top:'HAVE YOU TRIED',bot:'JUST DOING THE TASK?'},{bg:'🏌️',top:'WORK HARD NOW',bot:'SO YOU CAN GOLF SOMEDAY'},{bg:'📟',top:'I SENT YOU A FAX',bot:'ABOUT YOUR DUE DATE'},{bg:'🎣',top:"FISH DON'T PROCRASTINATE.",bot:'BE THE FISH.'},{bg:'📺',top:'IN MY DAY GOOGLE',bot:'WAS A LIBRARY CARD'}] },
+  horror:       { name:'Horror Mode',      emoji:'👁️', desc:'Your deadlines stalk you',  color:'#8b0000', memes:[{bg:'👁️',top:'THE TASK',bot:'IS INSIDE THE HOUSE'},{bg:'🩸',top:'REDRUM',bot:'IS DUE TOMORROW'},{bg:'💀',top:'YOUR SCHEDULE IS CALLING',bot:'FROM INSIDE THE SYLLABUS'},{bg:'🕷️',top:'IT LURKS...',bot:'YOUR UNFINISHED TASK'},{bg:'🌑',top:'YOU THOUGHT IT WAS OVER.',bot:'THE DEADLINE AWAKENS.'},{bg:'🪦',top:'RIP YOUR SLEEP SCHEDULE',bot:'KILLED BY PROCRASTINATION'}] },
+  anime:        { name:'Anime Arc',        emoji:'⚔️', desc:'Protagonist energy unlocked',color:'#ff6b35', memes:[{bg:'⚔️',top:'THIS IS MY FINAL FORM.',bot:'THE TASK IS DONE.'},{bg:'🌸',top:'MAIN CHARACTER DOES NOT',bot:'MISS DEADLINES. YOU ARE MAIN.'},{bg:'✨',top:'NEW ARC JUST DROPPED:',bot:'THE PERSON AWAKENS'},{bg:'🔥',top:'I HAVE SURPASSED',bot:'MY OWN PROCRASTINATION'},{bg:'💫',top:'FLASHBACK EPISODE:',bot:'YOU FORGOT THIS WAS DUE'},{bg:'🌀',top:'PLOT TWIST:',bot:'YOU ACTUALLY SUBMIT ON TIME'}] },
 };
 
 // ── STATE ──────────────────────────────────────────────────────────────────────
-
-let currentUser = null;
+let currentUser      = null;
 let currentPersonality = 'default';
-let currentView = 'dashboard';
-let currentFilter = 'All';
-let notifSettings = {
-  enabled: true,
-  interval: 30,
-  selectedPack: 'chaos',
-  urgentOnly: false,
-  osEnabled: false,
-};
-let notifLog = [];
-let notifTimer = null;
-let nextId = 1;
-let tasks = [];
-let editingTaskId = null;
+let currentView      = 'dashboard';
+let currentFilter    = 'All';
+let notifSettings    = { enabled:true, interval:30, selectedPack:'chaos', urgentOnly:false, osEnabled:false };
+let notifLog         = [];
+let notifTimer       = null;
+let tasks            = [];        // local mirror of Firestore data
+let editingTaskId    = null;
+let db               = null;
+let unsubscribeTasks = null;      // Firestore real-time listener cleanup
 
-// ── STORAGE KEYS ───────────────────────────────────────────────────────────────
+// ── FIRESTORE PATHS ────────────────────────────────────────────────────────────
+function tasksCollection()   { return db.collection('users').doc(currentUser.uid).collection('tasks'); }
+function settingsDoc()       { return db.collection('users').doc(currentUser.uid); }
 
-function tasksKey()    { return `git2g_tasks_${currentUser.email}`; }
-function settingsKey() { return `git2g_settings_${currentUser.email}`; }
-
-function loadUserData() {
-  try {
-    const t = JSON.parse(localStorage.getItem(tasksKey()) || '[]');
-    tasks = t;
-    nextId = tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
-  } catch { tasks = []; }
-
-  try {
-    const s = JSON.parse(localStorage.getItem(settingsKey()) || 'null');
-    if (s) {
-      notifSettings = { ...notifSettings, ...s.notifSettings };
-      if (s.personality) setPersonalityQuiet(s.personality);
-    }
-  } catch {}
+// ── FIRESTORE TASK OPS ─────────────────────────────────────────────────────────
+async function fsAddTask(task) {
+  const { id, ...data } = task; // strip local id; Firestore generates its own
+  const ref = await tasksCollection().add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  return ref.id;
 }
 
-function saveUserData() {
-  localStorage.setItem(tasksKey(), JSON.stringify(tasks));
-  localStorage.setItem(settingsKey(), JSON.stringify({
-    notifSettings,
-    personality: currentPersonality,
-  }));
+async function fsUpdateTask(fsId, changes) {
+  await tasksCollection().doc(fsId).update(changes);
+}
+
+async function fsDeleteTask(fsId) {
+  await tasksCollection().doc(fsId).delete();
+}
+
+// Save personality/notif settings to Firestore user doc
+async function saveSettings() {
+  try {
+    await settingsDoc().set({ personality: currentPersonality, notifSettings }, { merge: true });
+  } catch (e) { console.warn('Settings save failed:', e); }
+}
+
+// ── FIRESTORE REAL-TIME LISTENER ───────────────────────────────────────────────
+function subscribeToTasks() {
+  if (unsubscribeTasks) unsubscribeTasks();
+  unsubscribeTasks = tasksCollection()
+    .orderBy('createdAt', 'desc')
+    .onSnapshot(snapshot => {
+      tasks = snapshot.docs.map(doc => ({ fsId: doc.id, ...doc.data() }));
+      renderContent();
+    }, err => {
+      console.error('Firestore snapshot error:', err);
+    });
 }
 
 // ── AUTH ───────────────────────────────────────────────────────────────────────
-
 function logout() {
-  localStorage.removeItem('git2g_current_user');
-  window.location.href = 'auth.html';
+  if (unsubscribeTasks) unsubscribeTasks();
+  firebase.auth().signOut().then(() => window.location.href = 'auth.html');
 }
 
-function initUser() {
+// ── FIREBASE BOOT ──────────────────────────────────────────────────────────────
+(function initFirebase() {
   try {
-    currentUser = JSON.parse(localStorage.getItem('git2g_current_user') || 'null');
-  } catch { currentUser = null; }
-  if (!currentUser || !currentUser.email) {
-    window.location.href = 'auth.html';
-    return false;
+    if (typeof FIREBASE_CONFIG === 'undefined' || FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY') {
+      document.getElementById('app-loading').innerHTML =
+        '<div style="text-align:center;padding:40px;font-family:DM Sans,sans-serif;color:#f0eeff;max-width:420px">' +
+        '<div style="font-size:32px;margin-bottom:16px">⚙️</div>' +
+        '<div style="font-size:18px;font-weight:700;margin-bottom:12px">Firebase Not Configured</div>' +
+        '<div style="color:rgba(240,238,255,.6);line-height:1.6;margin-bottom:20px">Open <strong>firebase-config.js</strong> and paste your Firebase project credentials, then reload.</div>' +
+        '<a href="SETUP.html" style="color:#7c6af7;font-weight:600">View Setup Instructions →</a></div>';
+      return;
+    }
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+
+    firebase.auth().onAuthStateChanged(async user => {
+      if (!user) {
+        window.location.href = 'auth.html';
+        return;
+      }
+      currentUser = user;
+
+      // Populate user bar
+      const name = user.displayName || user.email.split('@')[0];
+      document.getElementById('user-name').textContent  = name;
+      document.getElementById('user-email').textContent = user.email;
+      document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+
+      // Load user settings (personality, notifSettings) from Firestore
+      try {
+        const doc = await settingsDoc().get();
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.personality)    setPersonalityQuiet(data.personality);
+          if (data.notifSettings)  notifSettings = { ...notifSettings, ...data.notifSettings };
+        }
+      } catch (e) { console.warn('Could not load settings:', e); }
+
+      // Apply personality visuals
+      applyPersonalityUI(currentPersonality);
+
+      // Start real-time task listener
+      subscribeToTasks();
+
+      // Hide loading overlay
+      document.getElementById('app-loading').style.display = 'none';
+
+      // Start notification timer
+      restartTimer();
+    });
+
+  } catch (e) {
+    console.error('Firebase init error:', e);
+    document.getElementById('app-loading').innerHTML =
+      '<div style="color:#f76a6a;padding:40px;font-family:sans-serif">Firebase error: ' + e.message + '<br><a href="SETUP.html" style="color:#7c6af7">Setup instructions</a></div>';
   }
-  document.getElementById('user-name').textContent = currentUser.name || currentUser.email.split('@')[0];
-  document.getElementById('user-email').textContent = currentUser.email;
-  document.getElementById('user-avatar').textContent = (currentUser.name || currentUser.email)[0].toUpperCase();
-  return true;
-}
+})();
 
 // ── HELPERS ────────────────────────────────────────────────────────────────────
-
 function makeDateStr(offset) {
-  const d = new Date();
-  d.setDate(d.getDate() + offset);
+  const d = new Date(); d.setDate(d.getDate() + offset);
   return d.toISOString().split('T')[0];
 }
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+const today = new Date(); today.setHours(0,0,0,0);
 
 function daysUntil(s) {
-  const d = new Date(s);
-  d.setHours(0, 0, 0, 0);
+  const d = new Date(s); d.setHours(0,0,0,0);
   return Math.round((d - today) / 86400000);
 }
 
 function urgencyClass(days, done) {
-  if (done) return 'done';
+  if (done)    return 'done';
   if (days < 0) return 'overdue';
   if (days <= 2) return 'urgent';
   if (days <= 5) return 'soon';
@@ -452,7 +323,7 @@ function urgencyClass(days, done) {
 }
 
 function dueLabel(days, done) {
-  if (done) return 'Done ✓';
+  if (done)     return 'Done ✓';
   if (days < 0) return `${Math.abs(days)}d overdue`;
   if (days === 0) return 'Due today!';
   if (days === 1) return 'Due tomorrow';
@@ -460,119 +331,104 @@ function dueLabel(days, done) {
 }
 
 function dueClass(days, done) {
-  if (done) return 'due-ok';
-  if (days < 0) return 'due-urgent';
+  if (done)     return 'due-ok';
   if (days <= 0) return 'due-urgent';
   if (days <= 5) return 'due-soon';
   return 'due-ok';
 }
 
 // ── OS NOTIFICATIONS ───────────────────────────────────────────────────────────
-
 function getNotifPermission() {
-  if (!('Notification' in window)) return 'unsupported';
-  return Notification.permission;
+  return ('Notification' in window) ? Notification.permission : 'unsupported';
 }
 
 async function requestOsPermission() {
-  if (!('Notification' in window)) return;
-  await Notification.requestPermission();
-  saveUserData();
-  renderContent();
+  if ('Notification' in window) await Notification.requestPermission();
+  saveSettings(); renderContent();
 }
 
 function fireOsNotification(meme, taskText) {
   if (getNotifPermission() !== 'granted') return;
   const n = new Notification('GetIt2gether', {
     body: `${meme.bg} ${meme.top} / ${meme.bot}\n${taskText}`,
-    tag: 'git2g-reminder',
-    requireInteraction: false,
+    tag: 'git2g-reminder', requireInteraction: false,
   });
   n.onclick = () => { window.focus(); n.close(); };
 }
 
 // ── PERSONALITY ────────────────────────────────────────────────────────────────
-
 function setPersonalityQuiet(p) {
+  if (!PERSONALITIES[p]) return;
+  Object.values(PERSONALITIES).forEach(v => { if (v.bodyClass) document.body.classList.remove(v.bodyClass); });
   const cfg = PERSONALITIES[p];
-  if (!cfg) return;
-  const body = document.body;
-  Object.values(PERSONALITIES).forEach(v => { if (v.bodyClass) body.classList.remove(v.bodyClass); });
-  if (cfg.bodyClass) body.classList.add(cfg.bodyClass);
+  if (cfg.bodyClass) document.body.classList.add(cfg.bodyClass);
   currentPersonality = p;
 }
 
-function setPersonality(p) {
-  setPersonalityQuiet(p);
+function applyPersonalityUI(p) {
   const cfg = PERSONALITIES[p];
-  document.getElementById('app-logo-name').textContent = cfg.logoName;
-  document.getElementById('app-tagline').textContent = cfg.tagline;
-  document.getElementById('topbar-greeting').textContent = cfg.greeting;
-  document.getElementById('modal-title').textContent = cfg.modalTitle;
+  document.getElementById('app-logo-name').textContent    = cfg.logoName;
+  document.getElementById('app-tagline').textContent      = cfg.tagline;
+  document.getElementById('topbar-greeting').textContent  = cfg.greeting;
+  document.getElementById('modal-title').textContent      = cfg.modalTitle;
   document.querySelectorAll('.p-pill').forEach(el => el.classList.remove('active'));
   const pill = document.getElementById('pill-' + p);
   if (pill) pill.classList.add('active');
-  updateCategoryLabels();
-  saveUserData();
-  renderContent();
-}
-
-function updateCategoryLabels() {
   CAT_KEYS.forEach(k => {
     const el = document.getElementById('nav-' + k + '-label');
     if (el) el.textContent = catLabel(k);
   });
 }
 
-// ── NAVIGATION ─────────────────────────────────────────────────────────────────
+function setPersonality(p) {
+  setPersonalityQuiet(p);
+  applyPersonalityUI(p);
+  saveSettings();
+  renderContent();
+}
 
+// ── NAVIGATION ─────────────────────────────────────────────────────────────────
 function switchView(v, el) {
   currentView = v;
   document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
   if (el) el.classList.add('active');
-  const cfg = PERSONALITIES[currentPersonality];
-  const catViews = { school: catLabel('school'), work: catLabel('work'), appts: catLabel('appts'), chores: catLabel('chores'), todo: catLabel('todo') };
-  const titles = { dashboard: 'Dashboard', tasks: 'All Tasks', upcoming: 'Upcoming', notifs: 'Notifications', ...catViews };
+  const catTitles = Object.fromEntries(CAT_KEYS.map(k => [k, catLabel(k)]));
+  const titles = { dashboard:'Dashboard', tasks:'All Tasks', upcoming:'Upcoming', notifs:'Notifications', ...catTitles };
   document.getElementById('view-title').textContent = titles[v] || v;
   if (v === 'notifs') document.getElementById('badge-notifs').textContent = '🔔';
   currentFilter = 'All';
-  document.getElementById('content-area').scrollIntoView({ block: 'start', behavior: 'instant' });
+  document.getElementById('content-area').scrollIntoView({ block:'start', behavior:'instant' });
   renderContent();
 }
 
 // ── MODAL ──────────────────────────────────────────────────────────────────────
-
-function openModal(taskId) {
-  editingTaskId = taskId || null;
+function openModal(fsId) {
+  editingTaskId = fsId || null;
   const cfg = PERSONALITIES[currentPersonality];
 
-  // Update category options with current personality names
+  // Populate category dropdown with current personality labels
   const catSelect = document.getElementById('input-cat');
-  catSelect.innerHTML = CAT_KEYS.map(k =>
-    `<option value="${k}">${catLabel(k)}</option>`
-  ).join('');
+  catSelect.innerHTML = CAT_KEYS.map(k => `<option value="${k}">${catLabel(k)}</option>`).join('');
 
   if (editingTaskId) {
-    const t = tasks.find(t => t.id === editingTaskId);
-    document.getElementById('modal-title').textContent = 'Edit Task';
+    const t = tasks.find(t => t.fsId === editingTaskId);
+    if (!t) return;
+    document.getElementById('modal-title').textContent      = 'Edit Task';
     document.getElementById('modal-save-label').textContent = 'Update Task';
-    document.getElementById('input-name').value = t.name;
-    catSelect.value = t.cat;
-    document.getElementById('input-course').value = t.detail || '';
-    document.getElementById('input-type').value = t.type;
-    document.getElementById('input-due').value = t.due;
+    document.getElementById('input-name').value     = t.name;
+    catSelect.value                                 = t.cat;
+    document.getElementById('input-course').value  = t.detail || '';
+    document.getElementById('input-type').value    = t.type;
+    document.getElementById('input-due').value     = t.due;
     document.getElementById('input-priority').value = t.priority;
   } else {
-    document.getElementById('modal-title').textContent = cfg.modalTitle;
+    document.getElementById('modal-title').textContent      = cfg.modalTitle;
     document.getElementById('modal-save-label').textContent = 'Save Task';
-    document.getElementById('input-name').value = '';
-    document.getElementById('input-course').value = '';
-    document.getElementById('input-due').value = makeDateStr(3);
-    // Pre-select category based on current view
-    if (CAT_KEYS.includes(currentView)) catSelect.value = currentView;
-    else catSelect.value = 'todo';
+    document.getElementById('input-name').value    = '';
+    document.getElementById('input-course').value  = '';
+    document.getElementById('input-due').value     = makeDateStr(3);
+    catSelect.value = CAT_KEYS.includes(currentView) ? currentView : 'todo';
   }
-
   document.getElementById('modal-overlay').classList.add('open');
 }
 
@@ -581,174 +437,105 @@ function closeModal() {
   editingTaskId = null;
 }
 
-function saveTask() {
+async function saveTask() {
   const name = document.getElementById('input-name').value.trim();
   if (!name) return;
 
-  if (editingTaskId) {
-    const t = tasks.find(t => t.id === editingTaskId);
-    t.name     = name;
-    t.cat      = document.getElementById('input-cat').value;
-    t.detail   = document.getElementById('input-course').value || '';
-    t.type     = document.getElementById('input-type').value;
-    t.due      = document.getElementById('input-due').value;
-    t.priority = document.getElementById('input-priority').value;
-  } else {
-    tasks.unshift({
-      id:       nextId++,
-      name,
-      cat:      document.getElementById('input-cat').value,
-      detail:   document.getElementById('input-course').value || '',
-      type:     document.getElementById('input-type').value,
-      due:      document.getElementById('input-due').value,
-      priority: document.getElementById('input-priority').value,
-      done:     false,
-      createdAt: Date.now(),
-    });
-  }
+  const data = {
+    name,
+    cat:      document.getElementById('input-cat').value,
+    detail:   document.getElementById('input-course').value.trim(),
+    type:     document.getElementById('input-type').value,
+    due:      document.getElementById('input-due').value,
+    priority: document.getElementById('input-priority').value,
+  };
 
-  saveUserData();
   closeModal();
-  renderContent();
+
+  if (editingTaskId) {
+    await fsUpdateTask(editingTaskId, data);
+  } else {
+    await fsAddTask({ ...data, done: false });
+  }
+  // Firestore listener will update tasks[] and re-render automatically
 }
 
-function toggleDone(id) {
-  const t = tasks.find(t => t.id === id);
-  if (t) { t.done = !t.done; saveUserData(); renderContent(); }
+async function toggleDone(fsId) {
+  const t = tasks.find(t => t.fsId === fsId);
+  if (t) await fsUpdateTask(fsId, { done: !t.done });
 }
 
-function deleteTask(id) {
-  tasks = tasks.filter(t => t.id !== id);
-  saveUserData();
-  renderContent();
+async function deleteTask(fsId) {
+  await fsDeleteTask(fsId);
 }
 
 // ── RENDER HELPERS ──────────────────────────────────────────────────────────────
-
 function renderTaskCard(t) {
   const days = daysUntil(t.due);
   const urg  = urgencyClass(days, t.done);
   const dl   = dueLabel(days, t.done);
   const dc   = dueClass(days, t.done);
-  const catDisplay = catLabel(t.cat);
   return `
     <div class="task-card ${urg}">
-      <div class="task-check ${t.done ? 'checked' : ''}" onclick="toggleDone(${t.id})">
-        ${t.done ? '<i class="ti ti-check" style="font-size:11px;color:var(--p-bg)" aria-hidden="true"></i>' : ''}
+      <div class="task-check ${t.done ? 'checked' : ''}" onclick="toggleDone('${t.fsId}')">
+        ${t.done ? '<i class="ti ti-check" style="font-size:11px;color:var(--p-bg)"></i>' : ''}
       </div>
-      <div class="task-info" onclick="toggleDone(${t.id})">
+      <div class="task-info" onclick="toggleDone('${t.fsId}')">
         <div class="task-name">${t.name}</div>
         <div class="task-meta">
           ${t.detail ? `<span class="task-course">${t.detail}</span>` : ''}
           <span class="task-type-badge">${t.type}</span>
-          <span class="task-type-badge">${catDisplay}</span>
+          <span class="task-type-badge">${catLabel(t.cat)}</span>
         </div>
       </div>
       <div class="task-right">
         <span class="task-due ${dc}">${dl}</span>
         <span style="font-size:10px;color:var(--p-muted)">${t.priority}</span>
         <div class="task-actions">
-          <button class="task-action-btn" onclick="event.stopPropagation();openModal(${t.id})" title="Edit">
-            <i class="ti ti-pencil" style="font-size:11px"></i>
-          </button>
-          <button class="task-action-btn danger" onclick="event.stopPropagation();deleteTask(${t.id})" title="Delete">
-            <i class="ti ti-trash" style="font-size:11px"></i>
-          </button>
+          <button class="task-action-btn" onclick="event.stopPropagation();openModal('${t.fsId}')" title="Edit"><i class="ti ti-pencil" style="font-size:11px"></i></button>
+          <button class="task-action-btn danger" onclick="event.stopPropagation();deleteTask('${t.fsId}')" title="Delete"><i class="ti ti-trash" style="font-size:11px"></i></button>
         </div>
       </div>
     </div>`;
 }
 
 // ── NOTIFICATION SETTINGS RENDER ───────────────────────────────────────────────
-
 function renderNotifSettings() {
   const perm = getNotifPermission();
-  const permLabels = {
-    granted:     { text: '✓ Granted',    cls: 'granted' },
-    denied:      { text: '✗ Blocked',    cls: 'denied'  },
-    default:     { text: '? Not asked',  cls: 'default' },
-    unsupported: { text: '✗ Unsupported',cls: 'denied'  },
-  };
-  const pl = permLabels[perm] || permLabels.default;
-
-  const permBanner = `
-    <div class="notif-permission-banner">
-      <div class="perm-icon">${perm === 'granted' ? '🔔' : perm === 'denied' ? '🔕' : '📲'}</div>
-      <div class="perm-text">
-        <div class="perm-title">Background Notifications
-          <span class="perm-status-pill ${pl.cls}" style="margin-left:8px">${pl.text}</span>
-        </div>
-        <div class="perm-desc">${
-          perm === 'granted'   ? "OS notifications active — you'll be alerted even when the tab is closed or minimized." :
-          perm === 'denied'    ? 'Blocked. Click the lock icon in your browser bar and allow notifications for this site.' :
-          perm === 'unsupported' ? "Your browser doesn't support push notifications." :
-          'Allow push notifications so reminders reach you even when the app is in the background.'
-        }</div>
-      </div>
-      ${perm === 'default' ? `<button class="btn btn-primary" style="flex-shrink:0;font-size:11px;padding:6px 12px" onclick="requestOsPermission()">Allow</button>` : ''}
-    </div>`;
-
-  const packCards = Object.entries(MEME_PACKS).map(([k, v]) => `
-    <div class="meme-pack-card ${notifSettings.selectedPack === k ? 'selected' : ''}" onclick="selectPack('${k}')">
-      <div class="pack-emoji">${v.emoji}</div>
-      <div class="pack-name">${v.name}</div>
-      <div class="pack-desc">${v.desc}</div>
-    </div>`).join('');
-
-  const intervals = [10, 30, 60, 120];
-  const intervalBtns = intervals.map(i =>
-    `<button class="interval-btn ${notifSettings.interval === i ? 'active' : ''}" onclick="setInterval2(${i})">${i < 60 ? i + 's' : i / 60 + 'h'}</button>`
-  ).join('');
-
-  const logItems = notifLog.slice(-5).reverse().map(l =>
-    `<div class="log-item"><span class="log-time">${l.time}</span><span class="log-msg">${l.meme.bg} ${l.meme.bot}</span><span class="log-pack">${l.pack}</span></div>`
-  ).join('');
+  const pl = { granted:{text:'✓ Granted',cls:'granted'}, denied:{text:'✗ Blocked',cls:'denied'}, default:{text:'? Not asked',cls:'default'}, unsupported:{text:'✗ Unsupported',cls:'denied'} }[perm] || {text:'?',cls:'default'};
 
   return `
-    ${permBanner}
+    <div class="notif-permission-banner">
+      <div class="perm-icon">${perm==='granted'?'🔔':perm==='denied'?'🔕':'📲'}</div>
+      <div class="perm-text">
+        <div class="perm-title">Background Notifications <span class="perm-status-pill ${pl.cls}" style="margin-left:8px">${pl.text}</span></div>
+        <div class="perm-desc">${perm==='granted'?"OS notifications active — you'll be alerted even when the tab is closed.":perm==='denied'?'Blocked. Click the lock icon in your browser bar and allow notifications.':perm==='unsupported'?"Your browser doesn't support push notifications.":'Allow notifications so reminders reach you even when the app is in the background.'}</div>
+      </div>
+      ${perm==='default'?`<button class="btn btn-primary" style="flex-shrink:0;font-size:11px;padding:6px 12px" onclick="requestOsPermission()">Allow</button>`:''}
+    </div>
+
     <div class="section-header"><span class="section-title">🔔 Notification Settings</span><div class="section-sep"></div></div>
     <div class="settings-panel">
-      <div class="settings-row">
-        <div>
-          <div class="settings-label">Enable in-app meme notifications</div>
-          <div class="settings-sub">Get roasted into productivity (while app is open)</div>
-        </div>
-        <div class="toggle ${notifSettings.enabled ? 'on' : ''}" onclick="toggleSetting('enabled')"><div class="toggle-knob"></div></div>
-      </div>
-      <div class="settings-row">
-        <div>
-          <div class="settings-label">Background OS notifications</div>
-          <div class="settings-sub">System alerts even when the app is closed${perm !== 'granted' ? ' — requires permission above' : ''}</div>
-        </div>
-        <div class="toggle ${notifSettings.osEnabled && perm === 'granted' ? 'on' : ''}" onclick="${perm === 'granted' ? "toggleSetting('osEnabled')" : 'requestOsPermission()'}"><div class="toggle-knob"></div></div>
-      </div>
-      <div class="settings-row">
-        <div>
-          <div class="settings-label">Urgent tasks only</div>
-          <div class="settings-sub">Only notify for tasks due within 2 days</div>
-        </div>
-        <div class="toggle ${notifSettings.urgentOnly ? 'on' : ''}" onclick="toggleSetting('urgentOnly')"><div class="toggle-knob"></div></div>
-      </div>
+      <div class="settings-row"><div><div class="settings-label">In-app meme notifications</div><div class="settings-sub">Get roasted into productivity (while app is open)</div></div><div class="toggle ${notifSettings.enabled?'on':''}" onclick="toggleSetting('enabled')"><div class="toggle-knob"></div></div></div>
+      <div class="settings-row"><div><div class="settings-label">Background OS notifications</div><div class="settings-sub">System alerts even when the app is closed${perm!=='granted'?' — requires permission above':''}</div></div><div class="toggle ${notifSettings.osEnabled&&perm==='granted'?'on':''}" onclick="${perm==='granted'?"toggleSetting('osEnabled')":'requestOsPermission()'}"><div class="toggle-knob"></div></div></div>
+      <div class="settings-row"><div><div class="settings-label">Urgent tasks only</div><div class="settings-sub">Only notify for tasks due within 2 days</div></div><div class="toggle ${notifSettings.urgentOnly?'on':''}" onclick="toggleSetting('urgentOnly')"><div class="toggle-knob"></div></div></div>
     </div>
+
     <div class="section-header" style="margin-top:4px"><span class="section-title">🎭 Choose Your Meme Pack</span><div class="section-sep"></div></div>
-    <div class="meme-pack-grid">${packCards}</div>
+    <div class="meme-pack-grid">${Object.entries(MEME_PACKS).map(([k,v])=>`<div class="meme-pack-card ${notifSettings.selectedPack===k?'selected':''}" onclick="selectPack('${k}')"><div class="pack-emoji">${v.emoji}</div><div class="pack-name">${v.name}</div><div class="pack-desc">${v.desc}</div></div>`).join('')}</div>
+
     <div class="section-header"><span class="section-title">⏱ Reminder Interval</span><div class="section-sep"></div></div>
     <div class="settings-panel" style="padding:14px 18px">
-      <div class="interval-row">${intervalBtns}</div>
+      <div class="interval-row">${[10,30,60,120].map(i=>`<button class="interval-btn ${notifSettings.interval===i?'active':''}" onclick="setInterval2(${i})">${i<60?i+'s':i/60+'h'}</button>`).join('')}</div>
     </div>
-    <button class="preview-btn" onclick="fireRandomMeme()">
-      <i class="ti ti-player-play" aria-hidden="true"></i> Preview a Notification Now
-    </button>
-    ${notifLog.length ? `
-      <div class="section-header" style="margin-top:16px">
-        <span class="section-title">📋 Recent Notifications</span><div class="section-sep"></div>
-      </div>
-      <div class="notif-log">${logItems}</div>` : ''}
+
+    <button class="preview-btn" onclick="fireRandomMeme()"><i class="ti ti-player-play"></i> Preview a Notification Now</button>
+
+    ${notifLog.length?`<div class="section-header" style="margin-top:16px"><span class="section-title">📋 Recent</span><div class="section-sep"></div></div><div class="notif-log">${notifLog.slice(-5).reverse().map(l=>`<div class="log-item"><span class="log-time">${l.time}</span><span class="log-msg">${l.meme.bg} ${l.meme.bot}</span><span class="log-pack">${l.pack}</span></div>`).join('')}</div>`:''}
   `;
 }
 
 // ── MAIN RENDER ────────────────────────────────────────────────────────────────
-
 function renderContent() {
   const area = document.getElementById('content-area');
   const cfg  = PERSONALITIES[currentPersonality];
@@ -757,73 +544,55 @@ function renderContent() {
   const done    = tasks.filter(t => t.done);
   const pct     = tasks.length ? Math.round(done.length / tasks.length * 100) : 0;
 
-  // Update all sidebar badges
   document.getElementById('badge-all').textContent = pending.length;
   CAT_KEYS.forEach(k => {
     const b = document.getElementById('badge-' + k);
     if (b) b.textContent = pending.filter(t => t.cat === k).length;
   });
 
-  if (currentView === 'notifs') {
-    area.innerHTML = renderNotifSettings();
-    return;
-  }
+  if (currentView === 'notifs') { area.innerHTML = renderNotifSettings(); return; }
 
   let html = '';
 
   if (currentView === 'dashboard') {
-    const apptsPending = pending.filter(t => t.cat === 'appts').length;
-    html += `
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value stat-accent">${pending.length}</div><div class="stat-sub">tasks remaining</div></div>
-        <div class="stat-card"><div class="stat-label">Urgent</div><div class="stat-value stat-danger">${urgent.length}</div><div class="stat-sub">due within 2 days</div></div>
-        <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value stat-success">${done.length}</div><div class="stat-sub">${pct}% of all tasks</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
-        <div class="stat-card"><div class="stat-label">${catLabel('appts')}</div><div class="stat-value stat-warn">${apptsPending}</div><div class="stat-sub">coming up</div></div>
-      </div>
-      <div class="motivation-banner"><i class="ti ti-sparkles banner-icon" aria-hidden="true"></i><span>${cfg.bannerMsg}</span></div>`;
+    html += `<div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value stat-accent">${pending.length}</div><div class="stat-sub">tasks remaining</div></div>
+      <div class="stat-card"><div class="stat-label">Urgent</div><div class="stat-value stat-danger">${urgent.length}</div><div class="stat-sub">due within 2 days</div></div>
+      <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value stat-success">${done.length}</div><div class="stat-sub">${pct}% of all tasks</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+      <div class="stat-card"><div class="stat-label">${catLabel('appts')}</div><div class="stat-value stat-warn">${pending.filter(t=>t.cat==='appts').length}</div><div class="stat-sub">coming up</div></div>
+    </div>
+    <div class="motivation-banner"><i class="ti ti-sparkles banner-icon"></i><span>${cfg.bannerMsg}</span></div>`;
 
-    if (urgent.length) {
-      html += `<div class="section-header"><span class="section-title">🚨 Urgent — Act Now</span><div class="section-sep"></div></div><div class="task-list">${urgent.map(renderTaskCard).join('')}</div>`;
-    }
+    if (urgent.length) html += `<div class="section-header"><span class="section-title">🚨 Urgent — Act Now</span><div class="section-sep"></div></div><div class="task-list">${urgent.map(renderTaskCard).join('')}</div>`;
 
     CAT_KEYS.forEach(k => {
-      const catTasks = pending.filter(t => t.cat === k && daysUntil(t.due) > 2).slice(0, 3);
-      if (catTasks.length) {
-        html += `<div class="section-header"><span class="section-title">${CAT_EMOJIS[k]} ${catLabel(k)}</span><div class="section-sep"></div></div><div class="task-list">${catTasks.map(renderTaskCard).join('')}</div>`;
-      }
+      const ct = pending.filter(t => t.cat === k && daysUntil(t.due) > 2).slice(0, 3);
+      if (ct.length) html += `<div class="section-header"><span class="section-title">${CAT_EMOJIS[k]} ${catLabel(k)}</span><div class="section-sep"></div></div><div class="task-list">${ct.map(renderTaskCard).join('')}</div>`;
     });
 
-    if (!tasks.length) {
-      html += `<div class="empty-state"><i class="ti ti-mood-smile" style="font-size:28px;display:block;margin-bottom:8px" aria-hidden="true"></i>No tasks yet — add your first one!</div>`;
-    }
+    if (!tasks.length) html += `<div class="empty-state"><i class="ti ti-rocket" style="font-size:28px;display:block;margin-bottom:8px"></i>No tasks yet! Add your first one to get started.</div>`;
 
   } else if (currentView === 'tasks' || currentView === 'upcoming') {
-    const filterLabels = ['All', ...CAT_KEYS.map(k => catLabel(k))];
-    const filterValues = ['All', ...CAT_KEYS];
-    html += `<div class="filter-tabs">${filterLabels.map((f, i) =>
-      `<div class="filter-tab ${currentFilter === filterValues[i] ? 'active' : ''}" onclick="currentFilter='${filterValues[i]}';renderContent()">${f}</div>`
-    ).join('')}</div>`;
+    const fLabels = ['All', ...CAT_KEYS.map(k => catLabel(k))];
+    const fValues = ['All', ...CAT_KEYS];
+    html += `<div class="filter-tabs">${fLabels.map((f,i) => `<div class="filter-tab ${currentFilter===fValues[i]?'active':''}" onclick="currentFilter='${fValues[i]}';renderContent()">${f}</div>`).join('')}</div>`;
 
     let filtered = currentView === 'upcoming'
-      ? tasks.filter(t => !t.done && daysUntil(t.due) >= 0).sort((a, b) => new Date(a.due) - new Date(b.due))
+      ? tasks.filter(t => !t.done && daysUntil(t.due) >= 0).sort((a,b) => new Date(a.due)-new Date(b.due))
       : [...tasks];
-
     if (currentFilter !== 'All') filtered = filtered.filter(t => t.cat === currentFilter);
 
     if (!filtered.length) {
-      html += `<div class="empty-state"><i class="ti ti-mood-smile" style="font-size:28px;display:block;margin-bottom:8px" aria-hidden="true"></i>Nothing here yet!</div>`;
+      html += `<div class="empty-state"><i class="ti ti-mood-smile" style="font-size:28px;display:block;margin-bottom:8px"></i>Nothing here yet!</div>`;
     } else {
-      const sections = [
-        { label: 'Overdue',              items: filtered.filter(t => !t.done && daysUntil(t.due) < 0) },
-        { label: 'Due Today & Tomorrow', items: filtered.filter(t => !t.done && daysUntil(t.due) >= 0 && daysUntil(t.due) <= 1) },
-        { label: 'This Week',            items: filtered.filter(t => !t.done && daysUntil(t.due) >= 2 && daysUntil(t.due) <= 7) },
-        { label: 'Later',                items: filtered.filter(t => !t.done && daysUntil(t.due) > 7) },
-        { label: 'Completed',            items: filtered.filter(t => t.done) },
-      ].filter(s => s.items.length);
-
-      sections.forEach(s => {
-        html += `<div class="section-header"><span class="section-title">${s.label}</span><div class="section-sep"></div></div>
-                 <div class="task-list">${s.items.map(renderTaskCard).join('')}</div>`;
+      [
+        { label:'Overdue',              items: filtered.filter(t => !t.done && daysUntil(t.due) < 0) },
+        { label:'Due Today & Tomorrow', items: filtered.filter(t => !t.done && daysUntil(t.due) >= 0 && daysUntil(t.due) <= 1) },
+        { label:'This Week',            items: filtered.filter(t => !t.done && daysUntil(t.due) >= 2 && daysUntil(t.due) <= 7) },
+        { label:'Later',                items: filtered.filter(t => !t.done && daysUntil(t.due) > 7) },
+        { label:'Completed',            items: filtered.filter(t => t.done) },
+      ].filter(s => s.items.length).forEach(s => {
+        html += `<div class="section-header"><span class="section-title">${s.label}</span><div class="section-sep"></div></div><div class="task-list">${s.items.map(renderTaskCard).join('')}</div>`;
       });
     }
 
@@ -831,17 +600,15 @@ function renderContent() {
     const k = currentView;
     const catTasks = tasks.filter(t => t.cat === k);
     if (!catTasks.length) {
-      html += `<div class="empty-state"><i class="ti ${CAT_ICONS[k]}" style="font-size:28px;display:block;margin-bottom:8px" aria-hidden="true"></i>No ${catLabel(k)} tasks yet.<br><button class="btn btn-primary" style="margin-top:12px" onclick="openModal()"><i class="ti ti-plus"></i> Add one</button></div>`;
+      html += `<div class="empty-state"><i class="ti ${CAT_ICONS[k]}" style="font-size:28px;display:block;margin-bottom:8px"></i>No ${catLabel(k)} tasks yet.<br><button class="btn btn-primary" style="margin-top:12px" onclick="openModal()"><i class="ti ti-plus"></i> Add one</button></div>`;
     } else {
-      const sections = [
-        { label: 'Overdue',     items: catTasks.filter(t => !t.done && daysUntil(t.due) < 0) },
-        { label: 'Coming Up',   items: catTasks.filter(t => !t.done && daysUntil(t.due) >= 0 && daysUntil(t.due) <= 7) },
-        { label: 'Later',       items: catTasks.filter(t => !t.done && daysUntil(t.due) > 7) },
-        { label: 'Completed',   items: catTasks.filter(t => t.done) },
-      ].filter(s => s.items.length);
-      sections.forEach(s => {
-        html += `<div class="section-header"><span class="section-title">${s.label}</span><div class="section-sep"></div></div>
-                 <div class="task-list">${s.items.map(renderTaskCard).join('')}</div>`;
+      [
+        { label:'Overdue',   items: catTasks.filter(t => !t.done && daysUntil(t.due) < 0) },
+        { label:'Coming Up', items: catTasks.filter(t => !t.done && daysUntil(t.due) >= 0 && daysUntil(t.due) <= 7) },
+        { label:'Later',     items: catTasks.filter(t => !t.done && daysUntil(t.due) > 7) },
+        { label:'Completed', items: catTasks.filter(t => t.done) },
+      ].filter(s => s.items.length).forEach(s => {
+        html += `<div class="section-header"><span class="section-title">${s.label}</span><div class="section-sep"></div></div><div class="task-list">${s.items.map(renderTaskCard).join('')}</div>`;
       });
     }
   }
@@ -850,35 +617,33 @@ function renderContent() {
 }
 
 // ── NOTIFICATION CONTROLS ──────────────────────────────────────────────────────
-
-function selectPack(k) { notifSettings.selectedPack = k; saveUserData(); renderContent(); }
-
-function setInterval2(i) { notifSettings.interval = i; restartTimer(); saveUserData(); renderContent(); }
-
+function selectPack(k)    { notifSettings.selectedPack = k; saveSettings(); renderContent(); }
+function setInterval2(i)  { notifSettings.interval = i; restartTimer(); saveSettings(); renderContent(); }
 function toggleSetting(k) {
   notifSettings[k] = !notifSettings[k];
   if (k === 'enabled') notifSettings.enabled ? restartTimer() : clearInterval(notifTimer);
-  saveUserData();
-  renderContent();
+  saveSettings(); renderContent();
 }
 
-// ── TOAST NOTIFICATIONS ────────────────────────────────────────────────────────
-
+// ── SERVICE WORKER REGISTRATION ───────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .catch(err => console.warn('SW registration failed:', err));
+  });
+}
 let toastCount = 0;
 
 function fireRandomMeme() {
   if (!notifSettings.enabled) return;
   const pack = MEME_PACKS[notifSettings.selectedPack];
   const meme = pack.memes[Math.floor(Math.random() * pack.memes.length)];
-
   const pending = tasks.filter(t => !t.done);
-  const urgentT = pending.filter(t => daysUntil(t.due) <= 2);
-  const pool    = notifSettings.urgentOnly ? urgentT : pending;
+  const pool    = notifSettings.urgentOnly ? pending.filter(t => daysUntil(t.due) <= 2) : pending;
   const rel     = pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
-
-  const now = new Date();
+  const now     = new Date();
   const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-  notifLog.push({ time: timeStr, meme, pack: pack.name });
+  notifLog.push({ time:timeStr, meme, pack:pack.name });
 
   const taskText = rel
     ? `"${rel.name}" ${daysUntil(rel.due) <= 0 ? 'is OVERDUE' : 'due ' + dueLabel(daysUntil(rel.due), false).toLowerCase()}`
@@ -887,19 +652,16 @@ function fireRandomMeme() {
   if (notifSettings.osEnabled) fireOsNotification(meme, taskText);
 
   const id  = 'toast-' + (++toastCount);
-  const bgColor = pack.color + '22';
-  const borderAccent = pack.color;
-
   const html = `
     <div class="notif-toast" id="${id}">
       <div class="notif-header">
         <div class="notif-app-icon" style="background:${pack.color}">G</div>
         <span class="notif-app-name">GetIt2gether</span>
         <span class="notif-time">now</span>
-        <button class="notif-dismiss" onclick="dismissToast('${id}')" aria-label="Dismiss"><i class="ti ti-x" style="font-size:12px"></i></button>
+        <button class="notif-dismiss" onclick="dismissToast('${id}')"><i class="ti ti-x" style="font-size:12px"></i></button>
       </div>
       <div class="notif-meme-zone">
-        <div class="meme-canvas" style="background:${bgColor};border:1.5px solid ${borderAccent}33">
+        <div class="meme-canvas" style="background:${pack.color}22;border:1.5px solid ${pack.color}33">
           <div class="meme-bg">${meme.bg}</div>
           <div class="meme-top-text">${meme.top}</div>
           <div class="meme-bot-text">${meme.bot}</div>
@@ -920,10 +682,8 @@ function fireRandomMeme() {
 }
 
 function dismissToast(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.add('hide');
-  el.classList.remove('show');
+  const el = document.getElementById(id); if (!el) return;
+  el.classList.add('hide'); el.classList.remove('show');
   setTimeout(() => el.remove(), 300);
 }
 
@@ -937,24 +697,6 @@ function restartTimer() {
       if (p.length) fireRandomMeme();
     }, notifSettings.interval * 1000);
   }
-}
-
-// ── BOOT ───────────────────────────────────────────────────────────────────────
-
-if (initUser()) {
-  loadUserData();
-  const cfg = PERSONALITIES[currentPersonality];
-  document.getElementById('app-logo-name').textContent = cfg.logoName;
-  document.getElementById('app-tagline').textContent   = cfg.tagline;
-  document.getElementById('topbar-greeting').textContent = cfg.greeting;
-  document.getElementById('modal-title').textContent   = cfg.modalTitle;
-  document.body.className = cfg.bodyClass || '';
-  const pill = document.getElementById('pill-' + currentPersonality);
-  if (pill) pill.classList.add('active');
-  updateCategoryLabels();
-  renderContent();
-  restartTimer();
-  if (tasks.length > 0) setTimeout(() => fireRandomMeme(), 2200);
 }
 </script>
 </body>
