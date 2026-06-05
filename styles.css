@@ -25,6 +25,7 @@
 }
 
 /* ── PERSONALITIES ── */
+
 .personality-zen {
   --p-bg: #f8f5f0;
   --p-surface: #fffefb;
@@ -73,46 +74,26 @@
   --p-font-body: 'Nunito', sans-serif;
 }
 
-/* ── RETRO TERMINAL ── */
-.personality-terminal {
-  --p-bg: #0c0f0a;
-  --p-surface: #111610;
-  --p-card: #161c14;
-  --p-border: rgba(74, 246, 38, 0.18);
-  --p-accent: #4af626;
-  --p-accent2: #b8ff8c;
-  --p-text: #d4f7c5;
-  --p-muted: rgba(180, 240, 150, 0.45);
-  --p-danger: #ff4c4c;
-  --p-warn: #f7c948;
-  --p-success: #4af626;
-  --p-font-display: 'Space Mono', monospace;
-  --p-font-body: 'Space Mono', monospace;
-  --p-radius: 4px;
-  --p-radius-sm: 2px;
-}
-.personality-terminal .logo-name { text-shadow: 0 0 8px rgba(74, 246, 38, 0.6); letter-spacing: 0.08em; }
-.personality-terminal .nav-item.active { background: rgba(74, 246, 38, 0.08); }
-
-/* ── COTTAGECORE ── */
-.personality-cottage {
-  --p-bg: #f5efe6;
-  --p-surface: #fdf8f0;
+/* ── ACADEMIC ── */
+.personality-academic {
+  --p-bg: #f7f5ef;
+  --p-surface: #fdfcf8;
   --p-card: #ffffff;
-  --p-border: rgba(139, 100, 60, 0.12);
-  --p-accent: #8b6340;
-  --p-accent2: #c4956a;
-  --p-text: #3a2c1e;
-  --p-muted: rgba(58, 44, 30, 0.48);
-  --p-danger: #b84040;
-  --p-warn: #c07830;
-  --p-success: #4a7c40;
+  --p-border: rgba(60, 50, 20, 0.1);
+  --p-accent: #3a6ea5;
+  --p-accent2: #c0833a;
+  --p-text: #1e1a10;
+  --p-muted: rgba(30, 26, 16, 0.48);
+  --p-danger: #b83030;
+  --p-warn: #c07020;
+  --p-success: #3a7a50;
   --p-font-display: 'Instrument Serif', serif;
   --p-font-body: 'DM Sans', sans-serif;
-  --p-radius: 18px;
-  --p-radius-sm: 12px;
+  --p-radius: 6px;
+  --p-radius-sm: 4px;
 }
-.personality-cottage .nav-item.active { background: rgba(139, 100, 60, 0.08); }
+.personality-academic .nav-item.active { background: rgba(58, 110, 165, 0.08); }
+.personality-academic .logo-name { letter-spacing: 0.02em; }
 
 /* ── CYBERPUNK ── */
 .personality-cyber {
@@ -138,13 +119,80 @@
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
 .personality-cyber .btn-primary, .personality-cyber .p-pill.active { box-shadow: 0 0 12px rgba(0, 240, 255, 0.4); }
-
 body.personality-cyber {
   background-image: linear-gradient(rgba(0,240,255,0.03) 1px,transparent 1px), linear-gradient(90deg,rgba(0,240,255,0.03) 1px,transparent 1px);
   background-size: 40px 40px;
 }
 
-/* Active nav bg per theme */
+/* ── SARCASTIC ── */
+.personality-sarcastic {
+  --p-bg: #111110;
+  --p-surface: #1a1a18;
+  --p-card: #222220;
+  --p-border: rgba(255, 255, 255, 0.06);
+  --p-accent: #aaaaaa;
+  --p-accent2: #666660;
+  --p-text: #d0d0cc;
+  --p-muted: rgba(200, 200, 196, 0.4);
+  --p-danger: #cc5555;
+  --p-warn: #cc9944;
+  --p-success: #779966;
+  --p-font-display: 'DM Sans', sans-serif;
+  --p-font-body: 'DM Sans', sans-serif;
+  --p-radius: 4px;
+  --p-radius-sm: 2px;
+}
+.personality-sarcastic .nav-item.active { background: rgba(170, 170, 170, 0.06); }
+.personality-sarcastic .logo-name { letter-spacing: -0.02em; opacity: 0.8; }
+.personality-sarcastic .motivation-banner { font-style: normal; opacity: 0.7; }
+
+/* ── CAT ── */
+.personality-cat {
+  --p-bg: #1a1520;
+  --p-surface: #211c2a;
+  --p-card: #2a2438;
+  --p-border: rgba(210, 170, 255, 0.1);
+  --p-accent: #c78fff;
+  --p-accent2: #ff9ecb;
+  --p-text: #ede0ff;
+  --p-muted: rgba(230, 210, 255, 0.45);
+  --p-danger: #ff7070;
+  --p-warn: #ffbf60;
+  --p-success: #80e8b0;
+  --p-font-display: 'Syne', sans-serif;
+  --p-font-body: 'DM Sans', sans-serif;
+  --p-radius: 20px;
+  --p-radius-sm: 14px;
+}
+.personality-cat .nav-item.active { background: rgba(199, 143, 255, 0.08); }
+.personality-cat .logo-name { letter-spacing: 0.04em; }
+body.personality-cat {
+  background-image: radial-gradient(rgba(199,143,255,0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ── DOG ── */
+.personality-dog {
+  --p-bg: #fffbf2;
+  --p-surface: #fff8e8;
+  --p-card: #ffffff;
+  --p-border: rgba(200, 140, 40, 0.14);
+  --p-accent: #e8920a;
+  --p-accent2: #e84e0a;
+  --p-text: #2a1f08;
+  --p-muted: rgba(42, 31, 8, 0.45);
+  --p-danger: #cc3030;
+  --p-warn: #cc7700;
+  --p-success: #3a8840;
+  --p-font-display: 'Nunito', sans-serif;
+  --p-font-body: 'Nunito', sans-serif;
+  --p-radius: 18px;
+  --p-radius-sm: 12px;
+}
+.personality-dog .nav-item.active { background: rgba(232, 146, 10, 0.08); }
+.personality-dog .logo-name { letter-spacing: 0.01em; }
+
+/* ── ACTIVE NAV BG PER THEME ── */
 .personality-zen .nav-item.active { background: rgba(123, 158, 123, 0.08); }
 .personality-grind .nav-item.active { background: rgba(57, 255, 20, 0.06); }
 .personality-bubbly .nav-item.active { background: rgba(255, 110, 199, 0.08); }
@@ -184,9 +232,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 20px 0;
-  /* Sidebar scrolls independently if content is tall */
   overflow-y: auto;
-  /* Stick to full viewport height */
   position: sticky;
   top: 0;
   height: 100vh;
@@ -246,10 +292,6 @@ body {
   background: rgba(124, 106, 247, 0.06);
 }
 
-.personality-zen .nav-item.active { background: rgba(123, 158, 123, 0.08); }
-.personality-grind .nav-item.active { background: rgba(57, 255, 20, 0.06); }
-.personality-bubbly .nav-item.active { background: rgba(255, 110, 199, 0.08); }
-
 .nav-badge {
   margin-left: auto;
   font-size: 10px;
@@ -268,7 +310,6 @@ body {
 .personality-switcher {
   padding: 14px 18px;
   border-top: 0.5px solid var(--p-border);
-  /* Always visible — never pushed off-screen */
   flex-shrink: 0;
 }
 
@@ -281,9 +322,10 @@ body {
   margin-bottom: 8px;
 }
 
+/* 9 pills → 3 columns of 3 */
 .personality-pills {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 5px;
 }
 
@@ -328,7 +370,6 @@ body {
   padding: 14px 22px;
   border-bottom: 0.5px solid var(--p-border);
   background: var(--p-surface);
-  /* Stick to top while content scrolls */
   position: sticky;
   top: 0;
   z-index: 10;
@@ -392,7 +433,6 @@ body {
 .content-area {
   flex: 1;
   padding: 18px 22px;
-  /* Natural document scroll — no overflow:hidden trapping */
   overflow-y: visible;
 }
 
@@ -470,6 +510,7 @@ body {
 .task-card.urgent { border-left-color: var(--p-danger); }
 .task-card.soon { border-left-color: var(--p-warn); }
 .task-card.ok { border-left-color: var(--p-success); }
+.task-card.overdue { border-left-color: var(--p-danger); }
 .task-card.done { opacity: 0.4; }
 .task-card.done .task-name { text-decoration: line-through; }
 
@@ -554,6 +595,7 @@ body {
   display: flex;
   gap: 6px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .filter-tab {
@@ -607,7 +649,6 @@ body {
 }
 
 /* ── NOTIFICATION TOASTS ── */
-/* Fixed to the viewport so they always appear regardless of scroll or tab */
 .notif-container {
   position: fixed;
   top: 14px;
@@ -1036,9 +1077,6 @@ body {
 .task-action-btn:hover { color: var(--p-accent); border-color: var(--p-accent); background: rgba(124,106,247,0.06); }
 .task-action-btn.danger:hover { color: var(--p-danger); border-color: var(--p-danger); background: rgba(247,106,106,0.06); }
 
-/* ── OVERDUE TASK STATE ── */
-.task-card.overdue { border-left-color: var(--p-danger); }
-
 /* ── OS NOTIFICATION PERMISSION BANNER ── */
 .notif-permission-banner {
   display: flex;
@@ -1064,10 +1102,3 @@ body {
 .perm-status-pill.granted { background: rgba(106,247,158,0.12); color: var(--p-success); border: 1px solid var(--p-success); }
 .perm-status-pill.denied  { background: rgba(247,106,106,0.12); color: var(--p-danger);  border: 1px solid var(--p-danger); }
 .perm-status-pill.default { background: rgba(247,183,106,0.12); color: var(--p-warn);    border: 1px solid var(--p-warn); }
-
-/* ── PERSONALITY PILLS 3-COL for 7 vibes ── */
-.personality-pills {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 5px;
-}
